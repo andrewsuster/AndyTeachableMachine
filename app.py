@@ -4,9 +4,9 @@ app = Flask(__name__)
 
 default_username = "Create Account"
 
-@app.route('/static/index')
+@app.route('/')
 def home():
-    return render_template("index.html", page_title=default_username)
+    return render_template("index.html")
 
 
 if __name__ == '__main__':

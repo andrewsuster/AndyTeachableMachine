@@ -20,23 +20,27 @@ let label = "";
 
 //square
 let playerY;
-let playerHeight = 50; // Adjusted player height
-let jumpHeight = 200; // Adjusted to jump twice as high
+let playerHeight = 50;
+let jumpHeight = 220;
 let isJumping = false;
 
 //obstacle
 let objectX;
-let objectWidth = 30;
-let obstacleHeight = 250; // Adjusted obstacle height
+let objectWidth = 85;
+let obstacleHeight = 200;
 let scrollSpeed = 5;
 
 
 let isGameOver = false;
 let gameStarted = false;
 let s2;
+let PIPE;
+let PIPE2;
 function preload() {
   classifier = ml5.imageClassifier(imageModelURL + 'model.json');
    s2 = loadImage('/static/s2.png');
+   PIPE = loadImage('/static/PIPE.png');
+   PIPE2 = loadImage('/static/PIPE2.png');
 }
 
 function setup() {
@@ -60,7 +64,7 @@ function setup() {
 }
 
 function draw() {
-  background(0);
+  background(209,237,242);
   image(flippedVideo, 1000, 0);
   fill(255);
   textSize(16);
@@ -118,10 +122,14 @@ function draw() {
   image(s2, 100, playerY, 50, playerHeight);
 
 //obstacles
-  fill(0, 255, 0);
+  fill(0, 0, 0);
   rect(objectX, height - obstacleHeight, objectWidth, obstacleHeight);
   rect(objectX, 0, objectWidth, obstacleHeight);
 
+  image(PIPE, objectX, height - obstacleHeight, objectWidth, obstacleHeight);
+// scale(1, -1);
+   image(PIPE2, objectX, 0, objectWidth, obstacleHeight);
+//scale(1, 1);
   objectX -= scrollSpeed;
 
 //obstacle reset

@@ -11,7 +11,7 @@ This example uses p5 preload function to create the classifier
 
 
 let classifier;
-let imageModelURL = 'https://teachablemachine.withgoogle.com/models/q_6tzXFwq/';
+let imageModelURL = 'https://teachablemachine.withgoogle.com/models/Op0AtSLBE/';
 
 
 let video;
@@ -32,13 +32,22 @@ let scrollSpeed = 5;
 
 
 let isGameOver = false;
-
+let gameStarted = false;
+let s2;
 function preload() {
   classifier = ml5.imageClassifier(imageModelURL + 'model.json');
+   s2 = loadImage('/static/s2.png');
 }
 
 function setup() {
-  createCanvas(1280, 650);
+
+  // Calculate the horizontal position to center the canvas
+  let canvasX = (windowWidth - 1280) / 2;
+  // Calculate the vertical position to center the canvas
+  let canvasY = (windowHeight - 650)
+  // Create the canvas with the calculated positions
+  createCanvas(1280, 650).position(canvasX, canvasY);
+
   video = createCapture(VIDEO);
   video.size(320, 240);
   video.hide();
@@ -57,6 +66,25 @@ function draw() {
   textSize(16);
   textAlign(CENTER);
   text(label, width / 1.1, height / 2.5);
+
+
+    if (!gameStarted) {
+    fill(100, 100,100,100); // Semi-transparent white
+    rect(0, 0, width, height); // Draw transparent overlay
+    fill(0);
+    textSize(32);
+    textAlign(CENTER);
+    fill(255, 255, 255);
+    text('Start Game With Spacebar', width / 2, height / 2);
+
+    fill(150, 150, 150);
+    textSize(23);
+    text('(Please wait until webcam loads)', width / 2, (height / 2)+50);
+
+
+
+    return; // Stop drawing further if game not started
+  }
 
 //collisions
   if (
@@ -85,11 +113,12 @@ function draw() {
   }
 
 //player
-  fill(255, 0, 0);
+  fill(0, 0, 0,0);
   rect(100, playerY, 50, playerHeight);
+  image(s2, 100, playerY, 50, playerHeight);
 
 //obstacles
-  fill(0, 0, 255);
+  fill(0, 255, 0);
   rect(objectX, height - obstacleHeight, objectWidth, obstacleHeight);
   rect(objectX, 0, objectWidth, obstacleHeight);
 
@@ -142,10 +171,18 @@ function jump() {
 
 //restart hgame
 function keyPressed() {
-  if (keyCode === 32 && isGameOver) { // 32 is the keycode for the spacebar
-    // Restart the game
+  if (keyCode === 32 && isGameOver) {
+    // restart game
     isGameOver = false;
     playerY = height - playerHeight;
     objectX = width;
   }
+
+
+    if (keyCode === 32 && !gameStarted) {
+    // start game
+    gameStarted = true;
+  }
 }
+
+

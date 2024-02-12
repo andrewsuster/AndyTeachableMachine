@@ -12,8 +12,8 @@ This example uses p5 preload function to create the classifier
 
 let classifier;
 let imageModelURL = 'https://teachablemachine.withgoogle.com/models/Op0AtSLBE/';
-
-
+let passedThroughPipe = false;
+let score = 0;
 let video;
 let flippedVideo;
 let label = "";
@@ -28,8 +28,16 @@ let isJumping = false;
 let objectX;
 let objectWidth = 85;
 let obstacleHeight = 200;
-let scrollSpeed = 5;
+let scrollSpeed = 4.3;
 
+let scrollPosition = 0;
+let imagescrollSpeed = 1;
+
+let treescrollPosition = 0;
+let treeimagescrollSpeed = 2.5;
+
+let skyImage;
+let treeImage;
 
 let isGameOver = false;
 let gameStarted = false;
@@ -41,6 +49,8 @@ function preload() {
    s2 = loadImage('/static/s2.png');
    PIPE = loadImage('/static/PIPE.png');
    PIPE2 = loadImage('/static/PIPE2.png');
+   skyImage = loadImage('/static/SKY.png');
+   treeImage = loadImage('/static/TREES.png');
 }
 
 function setup() {
@@ -48,7 +58,7 @@ function setup() {
   // Calculate the horizontal position to center the canvas
   let canvasX = (windowWidth - 1280) / 2;
   // Calculate the vertical position to center the canvas
-  let canvasY = (windowHeight - 650)
+  let canvasY = (windowHeight - 650) /1.3
   // Create the canvas with the calculated positions
   createCanvas(1280, 650).position(canvasX, canvasY);
 
@@ -65,14 +75,40 @@ function setup() {
 
 function draw() {
   background(209,237,242);
-  image(flippedVideo, 1000, 0);
+
   fill(255);
   textSize(16);
   textAlign(CENTER);
-  text(label, width / 1.1, height / 2.5);
 
+
+
+
+  //background images
+
+   scrollPosition -= imagescrollSpeed;
+
+   treescrollPosition -= treeimagescrollSpeed;
+
+   image(skyImage, scrollPosition, 0, width, height);
+
+   image(skyImage, scrollPosition + width, 0, width, height);
+
+    if (scrollPosition <= -width) {
+    // Reset the scroll position to the right of the second image
+    scrollPosition = 0;
+  }
+
+    image(treeImage, treescrollPosition, 0, width, height);
+
+   image(treeImage, treescrollPosition + width, 0, width, height);
+
+    if (treescrollPosition <= -width) {
+    // Reset the scroll position to the right of the second image
+    treescrollPosition = 0;
+  }
 
     if (!gameStarted) {
+      score=0;
     fill(100, 100,100,100); // Semi-transparent white
     rect(0, 0, width, height); // Draw transparent overlay
     fill(0);
@@ -91,7 +127,8 @@ function draw() {
   }
 
 //collisions
-  if (
+ if (
+    // Condition to check if the player collides with the pipe
     (objectX < 100 + 50 &&
     objectX + objectWidth > 100 &&
     playerY <= height - playerHeight &&
@@ -100,9 +137,18 @@ function draw() {
     objectX + objectWidth > 100 &&
     playerY <= obstacleHeight &&
     playerY + playerHeight >= 0)
-  ) {
+) {
+    // If player collides with an obstacle (pipe)
     isGameOver = true;
-  }
+    score = 0; // Reset score to zero
+} else if (objectX + objectWidth < 100 && !isGameOver && !passedThroughPipe) {
+    // If player successfully passes through the pipe without colliding and hasn't passed through already
+    score++; // Increase score by one
+    passedThroughPipe = true; // Set flag to true to indicate that player passed through the pipe
+} else if (objectX + objectWidth >= 100) {
+    // Reset the flag when the pipe moves past the player
+    passedThroughPipe = false;
+}
 
   if (isGameOver) {
     fill(255, 0, 0); // Red color
@@ -145,7 +191,15 @@ function draw() {
   } else if (playerY < height - playerHeight) {
     playerY += 5;
   }
+
+    image(flippedVideo, 1000, 0);
+    text(label, width / 1.1, height / 2.5);
+
+    fill(255); // Set text color to white
+    text("Score: " + score, width / 2, 50);
 }
+
+
 
 function classifyVideo() {
   flippedVideo = ml5.flipImage(video);
@@ -184,6 +238,7 @@ function keyPressed() {
     isGameOver = false;
     playerY = height - playerHeight;
     objectX = width;
+    score = 0;
   }
 
 
@@ -192,5 +247,3 @@ function keyPressed() {
     gameStarted = true;
   }
 }
-
-

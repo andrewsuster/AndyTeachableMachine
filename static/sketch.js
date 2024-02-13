@@ -17,6 +17,11 @@ let score = 0;
 let video;
 let flippedVideo;
 let label = "";
+let useless = 5;
+let loadingScreenDuration = 3000;
+let loadingComplete = false;
+let loadingStartTime;
+let button;
 
 //square
 let playerY;
@@ -44,6 +49,10 @@ let gameStarted = false;
 let s2;
 let PIPE;
 let PIPE2;
+
+let fist;
+let palm;
+
 function preload() {
   classifier = ml5.imageClassifier(imageModelURL + 'model.json');
    s2 = loadImage('/static/s2.png');
@@ -51,15 +60,15 @@ function preload() {
    PIPE2 = loadImage('/static/PIPE2.png');
    skyImage = loadImage('/static/SKY.png');
    treeImage = loadImage('/static/TREES.png');
+   palm = loadImage('/static/openhand.jpeg');
+   fist = loadImage('/static/closedhand.jpeg');
 }
 
 function setup() {
 
-  // Calculate the horizontal position to center the canvas
+loadingStartTime = millis();
   let canvasX = (windowWidth - 1280) / 2;
-  // Calculate the vertical position to center the canvas
   let canvasY = (windowHeight - 650) /1.3
-  // Create the canvas with the calculated positions
   createCanvas(1280, 650).position(canvasX, canvasY);
 
   video = createCapture(VIDEO);
@@ -74,6 +83,40 @@ function setup() {
 }
 
 function draw() {
+   if (!loadingComplete) {
+        background(0);
+        fill(255);
+        textSize(32);
+        textAlign(CENTER, CENTER);
+        text("Loading...", width / 2, height / 2);
+
+
+        if (millis() - loadingStartTime >= loadingScreenDuration) {
+            loadingComplete = true; // Loading complete, allow game to start
+        }
+    }
+   else {
+     background(0);
+        fill(255);
+        textSize(32);
+        textAlign(CENTER, CENTER);
+        text("Adjust your webcam until you can consistantly change the hand", width / 2, (height / (5/4)))-50;
+        text("Press 'space' when ready", width / 2, (height / (5/4))+50);
+
+
+if(label == 'Jump') {
+    image(palm, 480,100, 300, 300); // Adjusted x and y coordinates
+} else {
+    image(fist, 480,100 , 300, 300); // Adjusted x and y coordinates
+}
+
+ image(flippedVideo, 1000, 0);
+
+
+
+if (keyCode === 32){
+
+
   background(209,237,242);
 
   fill(255);
@@ -94,7 +137,7 @@ function draw() {
    image(skyImage, scrollPosition + width, 0, width, height);
 
     if (scrollPosition <= -width) {
-    // Reset the scroll position to the right of the second image
+
     scrollPosition = 0;
   }
 
@@ -103,14 +146,16 @@ function draw() {
    image(treeImage, treescrollPosition + width, 0, width, height);
 
     if (treescrollPosition <= -width) {
-    // Reset the scroll position to the right of the second image
+
     treescrollPosition = 0;
   }
 
     if (!gameStarted) {
       score=0;
-    fill(100, 100,100,100); // Semi-transparent white
-    rect(0, 0, width, height); // Draw transparent overlay
+          image(flippedVideo, 1000, 0);
+    image(s2, 100, playerY, 50, playerHeight);
+    fill(100, 100,100,100);
+    rect(0, 0, width, height);
     fill(0);
     textSize(32);
     textAlign(CENTER);
@@ -123,12 +168,12 @@ function draw() {
 
 
 
-    return; // Stop drawing further if game not started
+    return;
   }
 
 //collisions
  if (
-    // Condition to check if the player collides with the pipe
+
     (objectX < 100 + 50 &&
     objectX + objectWidth > 100 &&
     playerY <= height - playerHeight &&
@@ -138,28 +183,43 @@ function draw() {
     playerY <= obstacleHeight &&
     playerY + playerHeight >= 0)
 ) {
-    // If player collides with an obstacle (pipe)
+
     isGameOver = true;
-    score = 0; // Reset score to zero
+    score = 0;
 } else if (objectX + objectWidth < 100 && !isGameOver && !passedThroughPipe) {
-    // If player successfully passes through the pipe without colliding and hasn't passed through already
-    score++; // Increase score by one
-    passedThroughPipe = true; // Set flag to true to indicate that player passed through the pipe
+
+    score++;
+    passedThroughPipe = true;
 } else if (objectX + objectWidth >= 100) {
-    // Reset the flag when the pipe moves past the player
+
     passedThroughPipe = false;
 }
 
   if (isGameOver) {
-    fill(255, 0, 0); // Red color
+
+    scrollSpeed = 0;
+
+
+     imagescrollSpeed = 0.1;
+
+   treeimagescrollSpeed = 0;
+
+    fill(255, 0, 0);
     textSize(32);
     textAlign(CENTER);
     text('Game Over', width / 2, height / 2);
 
+    image(flippedVideo, 1000, 0);
+    image(s2, 100, playerY, 50, playerHeight);
     fill(100, 100, 100);
     textSize(15);
     text('Press (Space) to Start Again!', width / 2, (height / 2)+25);
-    return; // Stop drawing further if game over
+    image(PIPE, objectX, height - obstacleHeight, objectWidth, obstacleHeight);
+
+   image(PIPE2, objectX, 0, objectWidth, obstacleHeight);
+
+
+    return;
   }
 
 //player
@@ -193,10 +253,10 @@ function draw() {
   }
 
     image(flippedVideo, 1000, 0);
-    text(label, width / 1.1, height / 2.5);
-
     fill(255); // Set text color to white
-    text("Score: " + score, width / 2, 50);
+    text(score, width / 2, 100);
+}// game
+}
 }
 
 
@@ -239,11 +299,23 @@ function keyPressed() {
     playerY = height - playerHeight;
     objectX = width;
     score = 0;
+
+    scrollSpeed = 4.3;
+
+
+     imagescrollSpeed = 1;
+
+    treeimagescrollSpeed = 2.5;
   }
 
 
-    if (keyCode === 32 && !gameStarted) {
+    if (keyCode === 32 && !gameStarted && loadingComplete) {
     // start game
     gameStarted = true;
   }
+}
+
+function changeUseless() {
+  // Change the value of the useless variable
+  useless = 2;
 }

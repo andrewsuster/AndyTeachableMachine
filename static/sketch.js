@@ -252,14 +252,16 @@ if (keyCode === 32){
     objectX = width;
   }
 
-  if (isJumping) {
+if (isJumping) {
+  if (playerY > jumpHeight-220) {
     playerY -= 5;
-    if (playerY < height - playerHeight - jumpHeight) {
-      isJumping = false;
-    }
-  } else if (playerY < height - playerHeight) {
-    playerY += 5;
+  } else {
+    isJumping = false;
   }
+} else if (playerY < height - playerHeight) {
+  playerY += 5;
+}
+
 
     image(flippedVideo, 1000, 0);
     fill(255); // Set text color to white

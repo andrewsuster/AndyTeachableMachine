@@ -185,15 +185,17 @@ if (keyCode === 32){
 ) {
 
     isGameOver = true;
-    score = 0;
-} else if (objectX + objectWidth < 100 && !isGameOver && !passedThroughPipe) {
 
-    score++;
-    passedThroughPipe = true;
-} else if (objectX + objectWidth >= 100) {
+}    else if (objectX + objectWidth < 170 && !isGameOver && !passedThroughPipe) {
+                score++;
 
-    passedThroughPipe = false;
-}
+
+                passedThroughPipe = true;
+            } else if (objectX + objectWidth >= 170) {
+
+                passedThroughPipe = false;
+            }
+
 
   if (isGameOver) {
 
@@ -217,7 +219,14 @@ if (keyCode === 32){
     image(PIPE, objectX, height - obstacleHeight, objectWidth, obstacleHeight);
 
    image(PIPE2, objectX, 0, objectWidth, obstacleHeight);
+         fill(0); // Set text color to white
+                textSize(50);
+                text(score, (width / 2) + 3.5, (100) + 3.5);
 
+
+                fill(255); // Set text color to white
+                textSize(50);
+                text(score, width / 2, 100);
 
     return;
   }
@@ -254,7 +263,14 @@ if (keyCode === 32){
 
     image(flippedVideo, 1000, 0);
     fill(255); // Set text color to white
-    text(score, width / 2, 100);
+             fill(0); // Set text color to white
+                textSize(50);
+                text(score, (width / 2) + 3.5, (100) + 3.5);
+
+
+                fill(255); // Set text color to white
+                textSize(50);
+                text(score, width / 2, 100);
 }// game
 }
 }
